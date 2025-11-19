@@ -3,11 +3,11 @@
 #include "vec.h"
 
 // 960x540 (16:9 ratio)
-#define WIDTH  16*60
-#define HEIGHT 9*60
+#define WIDTH  960
+#define HEIGHT 540
 
 // Alpha is 255 (upper 8 bits, the rest are RGB)
-#define ALPHA 0xFF000000 
+#define ALPHA 0xFF000000
 
 int main(int argc, char *argv[]) {
 
@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
         SDL_DestroyWindow(window);
         SDL_Quit();
         return 1;
-    }  
+    }
 
     // Create Texture
     SDL_Texture *texture = SDL_CreateTexture(renderer,
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]) {
     bool quit = false;
 
     Uint32 startTime = SDL_GetTicks();
-    
+
     while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
@@ -86,9 +86,9 @@ int main(int argc, char *argv[]) {
                     o = tanh(5.0f * exp(l.x - 4.0f - p.y * vec4(-1, 1, 2, 0)) / o);
 
                     uint32_t color = ALPHA |
-                                     ((uint32_t)(fminf(fmaxf(o.x, 0.0f), 1.0f) * 255.0f) << 16) |
-                                     ((uint32_t)(fminf(fmaxf(o.y, 0.0f), 1.0f) * 255.0f) << 8)  |
-                                     ((uint32_t)(fminf(fmaxf(o.z, 0.0f), 1.0f) * 255.0f));
+                                     ((uint32_t)(fminf(fmaxf(o.x, 0.0f), 1.0f) * 0xFF) << 16) | // R
+                                     ((uint32_t)(fminf(fmaxf(o.y, 0.0f), 1.0f) * 0xFF) << 8)  | // G
+                                     ((uint32_t)(fminf(fmaxf(o.z, 0.0f), 1.0f) * 0xFF));        // B
 
                     pixels[y * stride + x] = color;
                 }
