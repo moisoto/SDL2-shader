@@ -1,4 +1,4 @@
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <stdbool.h>
 #include "vec.h"
 
@@ -12,24 +12,27 @@
 int main(int argc, char *argv[]) {
 
     // Initialize SDL
-    if (SDL_Init(SDL_INIT_VIDEO) != 0) {
+    if (!SDL_Init(SDL_INIT_VIDEO)) {
         SDL_Log("SDL_Init error: %s", SDL_GetError());
         return 1;
     }
 
     // Create Window
     SDL_Window *window = SDL_CreateWindow("XOR Plasma",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WIDTH, HEIGHT,
-        SDL_WINDOW_SHOWN);
+        0);
     if (!window) {
         SDL_Log("SDL_CreateWindow error: %s", SDL_GetError());
         SDL_Quit();
         return 1;
     }
 
-    // Create Rendered
-    SDL_Renderer *renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED);
+    // Center the window (position is no longer part of CreateWindow)
+    SDL_SetWindowPosition(window, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED);
+
+    // Create Renderer
+    // SDL3 uses driver name instead of index + flags
+    SDL_Renderer *renderer = SDL_CreateRenderer(window, NULL);  // NULL = let SDL pick best driver
     if (!renderer) {
         SDL_Log("SDL_CreateRenderer error: %s", SDL_GetError());
         SDL_DestroyWindow(window);
@@ -54,13 +57,13 @@ int main(int argc, char *argv[]) {
     int pitch;
     bool quit = false;
 
-    Uint32 startTime = SDL_GetTicks();
+    Uint64 startTime = SDL_GetTicks();
 
     while (!quit) {
         SDL_Event event;
         while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) quit = true;
-            if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_ESCAPE) quit = true;
+            if (event.type == SDL_EVENT_QUIT) quit = true;
+            if (event.type == SDL_EVENT_KEY_DOWN && event.key.key == SDLK_ESCAPE) quit = true;
         }
 
         // Time in seconds, with smooth looping
@@ -68,7 +71,7 @@ int main(int argc, char *argv[]) {
         float t = fmodf(time * 0.5f, 2.0f * (float)M_PI);  // adjust speed here
 
         // Lock texture and generate current frame
-        if (SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch) == 0) {
+        if (SDL_LockTexture(texture, NULL, (void**)&pixels, &pitch)) {
             int stride = pitch / sizeof(uint32_t);
             vec2 r = {(float)WIDTH, (float)HEIGHT};
 
@@ -97,7 +100,7 @@ int main(int argc, char *argv[]) {
         }
 
         SDL_RenderClear(renderer);
-        SDL_RenderCopy(renderer, texture, NULL, NULL);
+        SDL_RenderTexture(renderer, texture, NULL, NULL);
         SDL_RenderPresent(renderer);
 
         SDL_Delay(16); // ~60 FPS

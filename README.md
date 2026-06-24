@@ -6,14 +6,16 @@ The original gist code can be downloaded from https://gist.github.com/rexim/ef86
 
 ## Compliling and Running
 
-First intall SDL2 by running:
+First intall SDL3 & SDL2 by running:
 
 ```shell
+brew install sdl3
 brew install sdl2
 ```
 
 To compile use the following command (also included in the `compile.sh` script):
 
 ```shell
-clang -O3 main.cpp -I/opt/homebrew/include -L/opt/homebrew/lib -lSDL2 -lm -o shader
+clang -O3 sdl2-shader.cpp -I/opt/homebrew/include -L/opt/homebrew/lib -lSDL2 -lm -o shader
+clang -O3 sdl3-shader.cpp -I/opt/homebrew/include -L/opt/homebrew/lib -lSDL3 -lm -o sdl3-shader
 ```
